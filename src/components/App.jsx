@@ -103,9 +103,8 @@ export const App = () => {
       {photos.length !== 0 && btnLoadMore && (
         <Button onClickRender={loadMorePhoto} />
       )}
-      {showModal && (
-        <Modal selectedPhoto={selectedPhoto} onClose={toggleModal} />
-      )}
+      {showModal && <Modal selectedPhoto={selectedPhoto} onClose={toggleModal}>
+          </Modal>}
     </div>
   );
 }

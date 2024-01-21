@@ -1,44 +1,36 @@
-import { createPortal } from 'react-dom';
-import { Component } from 'react';
+import { useEffect } from 'react';
 import css from './Modal.module.css';
 
-const modalRoot = document.querySelector('#modal-root');
+// const modalRoot = document.querySelector('#modal-root');
 
-class Modal extends Component {
-  componentDidMount = () => {
-    window.addEventListener('keydown', this.onEscapeCloseModal);
-  };
+export const Modal = ({selectedPhoto, onClose}) => {
+  const {largeImageURL, tag} = selectedPhoto;
 
-  componentWillUnmount = () => {
-    window.removeEventListener('keydown', this.onEscapeCloseModal);
-  };
+  useEffect(() => {
+    // клавіша Escape
+    const onEscapeCloseModal = (event) => {
+        if (event.code === 'Escape') {
+        onClose();
+        }
+    };
+    window.addEventListener('keydown', onEscapeCloseModal);
 
-  onEscapeCloseModal = event => {
-    if (event.code === 'Escape') {
-      this.props.onClose();
-    }
-  };
-
-  onClickOverlay = event => {
+    return () => window.removeEventListener('keydown', onEscapeCloseModal);
+}, [onClose]);
+   
+   // клік на оверлей  
+  const onClickOverlay = (event) => {
     if (event.target === event.currentTarget) {
-      this.props.onClose();
-    }
-  };
-
-  render() {
-    const {
-      selectedPhoto: { largeImageURL, tags },
-    } = this.props;
-
-    return createPortal(
-      <div className={css.overlay} onClick={this.onClickOverlay}>
-        <div className={css.modal}>
-          <img src={largeImageURL} alt={tags} />
-        </div>
-      </div>,
-      modalRoot
-    );
-  }
+        onClose()
+    };
 }
 
-export { Modal };
+    return (
+      <div className={css.overlay} onClick={onClickOverlay}>
+        <div className={css.modal}>
+          <img src={largeImageURL} alt={tag} />
+        </div>
+      </div>
+    );
+}
+
