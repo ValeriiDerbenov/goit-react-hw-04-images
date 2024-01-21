@@ -29,118 +29,70 @@ export const App = () => {
   useEffect(() => {
     if(!search) return;
 
-   
-    const addPhotoPage = (search, page) => {
-      setLoading({ loading: true });
-  
-      fetchPhoto(search, page, perPage)
-        .then(data => {
-          const { totalHits } = data;
-          const totalPage = Math.ceil(data.totalHits / perPage);
+    const loadImages = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchPhoto(search, page)
+        
+          const { totalHits, hits } = response;
+          const totalPage = Math.ceil(totalHits / perPage);
           if (totalHits === 0) {
             return Notify.info(
               'There are no images matching your search query. Please try again',
               paramsForNotify
-            );
-          }
+            );}
+
+            const arrPhotos = hits.map(({ id, webformatURL, largeImageURL, tags }) => (
+              { id, webformatURL, largeImageURL, tags }
+            ));
   
-          const arrPhotos = data.hits.map(
-            ({ id, webformatURL, largeImageURL, tags }) => ({
-              id,
-              webformatURL,
-              largeImageURL,
-              tags,
-            })
-          );
-  
-          setPhoto(prevState => ({
-            photos: [...prevState.photos, ...arrPhotos],
-          }));
+          setPhoto(prevState=> [...prevState, ...arrPhotos]); 
   
           if (totalPage > page) {
-            setBtnLoadMore({ btnLoadMore: true });
+            setBtnLoadMore(true);
           } else {
             Notify.info(
               "You've reached the end of search results",
               paramsForNotify
             );
-            setBtnLoadMore({ btnLoadMore: false });
-          }
-        })
-        .catch(onFetchError)
-        .finally(() => {
-          setLoading({ loading: false });
-        });
+            setBtnLoadMore(false);
+          }}
+      
+      catch(error) {
+        onFetchError(error)
+      }
+      finally {
+        setLoading(false);
+      };  
     };
-    if (search !== '') {
-      addPhotoPage(search, page);
-    }
-
-
+    
+      loadImages();
+      setBtnLoadMore(false);
   }, [search, page]);
 
- 
-
-
   const loadMorePhoto = () => {
-    setPage(({ page }) => ({ page: page + 1 }));
+    setPage(page + 1);
+    setLoading(true)  
   };
 
   const toggleModal = () => {
-    setShowModal(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+    setShowModal((prev) => !prev)
+  }
+
+  const onClickOpenModal = (photo) => {
+    setShowModal(true);
+    setSelectedPhoto(photo);
   };
 
-  const onClickOpenModal = event => {
-    const imageId = event.target.getAttribute('data-id');
-    const selectedPhoto = photos.find(photo => photo.id === Number(imageId));
-    setSelectedPhoto({ selectedPhoto });
-
-    toggleModal();
-  };
-
-  const onSubmitSearchBar = event => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const searchValue = form.search.value
-      .trim()
-      .toLowerCase()
-      .split(' ')
-      .join('+');
-
-    if (searchValue === '') {
-      Notify.info('Enter your request, please!', paramsForNotify);
-      return;
-    }
-
-    if (searchValue === search) {
-      Notify.info('Enter new request, please!', paramsForNotify);
-      return;
-    }
-
-    // this.setState({
-    //   search: searchValue,
-    //   page: 1,
-    //   photos: [],
-    // });
-    setSearch({
-      search: searchValue         
-    });
-    setPage({
-      page: 1
-    });
-    setPhoto({
-      photos: []
-    });        
-
-  };
-
-
+ const handleSubmit = (searchValue) => {
+  setSearch(searchValue)
+  setPage(1)
+  setPhoto([]);
+};
 
   return (
     <div>
-      <Searchbar onSubmitSearchBar={onSubmitSearchBar} />
+      <Searchbar onSubmit={handleSubmit} />
       {loading && <Loader />}      
       <div className={css.container}>
         <ImageGallery
