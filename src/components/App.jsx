@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { fetchPhoto, onFetchError } from './Api/api';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -16,6 +16,149 @@ export const paramsForNotify = {
 };
 const perPage = 12;
 
+export const App = () => {
+
+  const [search, setSearch] = useState('');
+  const [photos, setPhoto] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [btnLoadMore, setBtnLoadMore] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+  useEffect(() => {
+    if(!search) return;
+
+   
+    const addPhotoPage = (search, page) => {
+      setLoading({ loading: true });
+  
+      fetchPhoto(search, page, perPage)
+        .then(data => {
+          const { totalHits } = data;
+          const totalPage = Math.ceil(data.totalHits / perPage);
+          if (totalHits === 0) {
+            return Notify.info(
+              'There are no images matching your search query. Please try again',
+              paramsForNotify
+            );
+          }
+  
+          const arrPhotos = data.hits.map(
+            ({ id, webformatURL, largeImageURL, tags }) => ({
+              id,
+              webformatURL,
+              largeImageURL,
+              tags,
+            })
+          );
+  
+          setPhoto(prevState => ({
+            photos: [...prevState.photos, ...arrPhotos],
+          }));
+  
+          if (totalPage > page) {
+            setBtnLoadMore({ btnLoadMore: true });
+          } else {
+            Notify.info(
+              "You've reached the end of search results",
+              paramsForNotify
+            );
+            setBtnLoadMore({ btnLoadMore: false });
+          }
+        })
+        .catch(onFetchError)
+        .finally(() => {
+          setLoading({ loading: false });
+        });
+    };
+    if (search !== '') {
+      addPhotoPage(search, page);
+    }
+
+
+  }, [search, page]);
+
+ 
+
+
+  const loadMorePhoto = () => {
+    setPage(({ page }) => ({ page: page + 1 }));
+  };
+
+  const toggleModal = () => {
+    setShowModal(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
+  const onClickOpenModal = event => {
+    const imageId = event.target.getAttribute('data-id');
+    const selectedPhoto = photos.find(photo => photo.id === Number(imageId));
+    setSelectedPhoto({ selectedPhoto });
+
+    toggleModal();
+  };
+
+  const onSubmitSearchBar = event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const searchValue = form.search.value
+      .trim()
+      .toLowerCase()
+      .split(' ')
+      .join('+');
+
+    if (searchValue === '') {
+      Notify.info('Enter your request, please!', paramsForNotify);
+      return;
+    }
+
+    if (searchValue === search) {
+      Notify.info('Enter new request, please!', paramsForNotify);
+      return;
+    }
+
+    // this.setState({
+    //   search: searchValue,
+    //   page: 1,
+    //   photos: [],
+    // });
+    setSearch({
+      search: searchValue         
+    });
+    setPage({
+      page: 1
+    });
+    setPhoto({
+      photos: []
+    });        
+
+  };
+
+
+
+  return (
+    <div>
+      <Searchbar onSubmitSearchBar={onSubmitSearchBar} />
+      {loading && <Loader />}      
+      <div className={css.container}>
+        <ImageGallery
+          photos={photos}
+          onClickImageItem={onClickOpenModal}
+        />
+      </div>
+      {photos.length !== 0 && btnLoadMore && (
+        <Button onClickRender={loadMorePhoto} />
+      )}
+      {showModal && (
+        <Modal selectedPhoto={selectedPhoto} onClose={toggleModal} />
+      )}
+    </div>
+  );
+}
+
+/*
 export class App extends Component {
   state = {
     search: '',
@@ -152,6 +295,7 @@ export class App extends Component {
     );
   }
 }
+*/
 
 /*
 export const App = () => {
