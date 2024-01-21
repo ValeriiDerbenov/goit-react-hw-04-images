@@ -1,19 +1,20 @@
 import css from './ImageGalleryItem.module.css';
 
-const ImageGalleryItem = ({ id, smallUrl, tags, onClickImageItem }) => (
-  <div
-    className={css.imageGalleryItem}
-    key={id}
-    data-id={id}
-    onClick={onClickImageItem}
-  >
-    <img
-      className={css.imageGalleryItemImg}
-      src={smallUrl}
-      alt={tags}
-      data-id={id}
-    />
-  </div>
+export const ImageGalleryItem = ({item, openModal}) => (
+
+  // const { tags, webformatURL, largeImageURL } = item;
+
+  <>
+      <li
+      className={css.ImageGalleryItem}
+      onClick={e => {
+        e.preventDefault();
+        openModal(item.largeImageURL, item.tags);
+      }}
+    >
+      <img  className={css.imageGalleryItemImg} src={item.webformatURL} alt={item.tags} loading="lazy" />
+    </li>
+  </>
 );
 
-export { ImageGalleryItem };
+

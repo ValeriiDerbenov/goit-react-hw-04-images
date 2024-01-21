@@ -5,6 +5,7 @@ import css from './Modal.module.css';
 
 export const Modal = ({selectedPhoto, onClose}) => {
   const {largeImageURL, tag} = selectedPhoto;
+  console.log(selectedPhoto);
 
   useEffect(() => {
     // клавіша Escape
@@ -16,9 +17,8 @@ export const Modal = ({selectedPhoto, onClose}) => {
     window.addEventListener('keydown', onEscapeCloseModal);
 
     return () => window.removeEventListener('keydown', onEscapeCloseModal);
-}, [onClose]);
-   
-   // клік на оверлей  
+    }, [onClose]);
+  
   const onClickOverlay = (event) => {
     if (event.target === event.currentTarget) {
         onClose()

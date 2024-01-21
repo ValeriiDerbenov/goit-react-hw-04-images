@@ -19,7 +19,7 @@ const perPage = 12;
 export const App = () => {
 
   const [search, setSearch] = useState('');
-  const [photos, setPhoto] = useState([]);
+  const [photos, setPhotos] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [btnLoadMore, setBtnLoadMore] = useState(false);
@@ -46,7 +46,7 @@ export const App = () => {
               { id, webformatURL, largeImageURL, tags }
             ));
   
-          setPhoto(prevState=> [...prevState, ...arrPhotos]); 
+          setPhotos(prevState=> [...prevState, ...arrPhotos]); 
   
           if (totalPage > page) {
             setBtnLoadMore(true);
@@ -79,7 +79,7 @@ export const App = () => {
     setShowModal((prev) => !prev)
   }
 
-  const onClickOpenModal = (photo) => {
+  const onOpenModal = (photo) => {
     setShowModal(true);
     setSelectedPhoto(photo);
   };
@@ -87,7 +87,7 @@ export const App = () => {
  const handleSubmit = (searchValue) => {
   setSearch(searchValue)
   setPage(1)
-  setPhoto([]);
+  setPhotos([]);
 };
 
   return (
@@ -95,10 +95,7 @@ export const App = () => {
       <Searchbar onSubmit={handleSubmit} />
       {loading && <Loader />}      
       <div className={css.container}>
-        <ImageGallery
-          photos={photos}
-          onClickImageItem={onClickOpenModal}
-        />
+      { photos && <ImageGallery photos={photos} openModal={onOpenModal}/>}
       </div>
       {photos.length !== 0 && btnLoadMore && (
         <Button onClickRender={loadMorePhoto} />
