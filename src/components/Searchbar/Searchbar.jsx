@@ -1,4 +1,4 @@
-import css from './Searchbar.module.css'
+import css from './Searchbar.module.css';
 
 export const Searchbar = ({ onSubmitSearchBar }) => (
   <div className={css.searchbar}>
@@ -13,9 +13,9 @@ export const Searchbar = ({ onSubmitSearchBar }) => (
         placeholder="Search images and photos"
       />
 		<button className={css.searchFormBtn}>Search
-        {/* <span className={css.searchFormBtnSpan}></span> */}
     </button>
 			
     </form>
   </div>
 );
+

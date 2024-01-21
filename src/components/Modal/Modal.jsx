@@ -4,7 +4,7 @@ import css from './Modal.module.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export class Modal extends Component {
+class Modal extends Component {
   componentDidMount = () => {
     window.addEventListener('keydown', this.onEscapeCloseModal);
   };
@@ -41,3 +41,4 @@ export class Modal extends Component {
   }
 }
 
+export { Modal };

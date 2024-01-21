@@ -1,8 +1,8 @@
 import css from './ImageGalleryItem.module.css';
 
-export const ImageGalleryItem = ({ id, smallUrl, tags, onClickImageItem }) => (
+const ImageGalleryItem = ({ id, smallUrl, tags, onClickImageItem }) => (
   <div
-    className={css.ImageGalleryItem}
+    className={css.imageGalleryItem}
     key={id}
     data-id={id}
     onClick={onClickImageItem}
@@ -15,3 +15,5 @@ export const ImageGalleryItem = ({ id, smallUrl, tags, onClickImageItem }) => (
     />
   </div>
 );
+
+export { ImageGalleryItem };
